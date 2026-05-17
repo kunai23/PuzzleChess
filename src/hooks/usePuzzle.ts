@@ -4,7 +4,7 @@ import type { Puzzle } from '../data/puzzles';
 
 export type PuzzleStatus = 'playing' | 'correct' | 'incorrect' | 'solved';
 
-export function usePuzzle(puzzle: Puzzle) {
+export function usePuzzle(puzzle: Puzzle, onOpponentMove?: () => void) {
   const [game, setGame] = useState(() => new Chess(puzzle.fen));
   const [solutionIndex, setSolutionIndex] = useState(0);
   const [status, setStatus] = useState<PuzzleStatus>('playing');
@@ -70,12 +70,13 @@ export function usePuzzle(puzzle: Puzzle) {
         const afterOppIndex = nextIndex + 1;
         setSolutionIndex(afterOppIndex);
         setStatus(afterOppIndex >= puzzle.solution.length ? 'solved' : 'playing');
+        onOpponentMove?.();
       }, 500);
 
       setSolutionIndex(nextIndex);
       return true;
     },
-    [game, puzzle.solution, solutionIndex, status]
+    [game, puzzle.solution, solutionIndex, status, onOpponentMove]
   );
 
   const hint = useCallback(() => {

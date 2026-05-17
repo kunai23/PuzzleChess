@@ -3,8 +3,8 @@ import type { Puzzle } from '../data/puzzles';
 interface Props {
   puzzle: Puzzle;
   index: number;
-  total: number;
-  score: number;
+  total: number; // -1 = training mode (hide counter)
+  score: number; // -1 = training mode (hide score)
 }
 
 const difficultyColor: Record<string, string> = {
@@ -17,7 +17,7 @@ export default function PuzzleInfo({ puzzle, index, total, score }: Props) {
   return (
     <div className="puzzle-info">
       <div className="puzzle-meta">
-        <span className="puzzle-counter">{index + 1} / {total}</span>
+        {total >= 0 && <span className="puzzle-counter">{index + 1} / {total}</span>}
         <span
           className="difficulty-badge"
           style={{ backgroundColor: difficultyColor[puzzle.difficulty] }}
@@ -53,10 +53,12 @@ export default function PuzzleInfo({ puzzle, index, total, score }: Props) {
         </a>
       </div>
 
-      <div className="score-display">
-        <span>Score : </span>
-        <strong>{score} pts</strong>
-      </div>
+      {score >= 0 && (
+        <div className="score-display">
+          <span>Score : </span>
+          <strong>{score} pts</strong>
+        </div>
+      )}
     </div>
   );
 }

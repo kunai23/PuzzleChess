@@ -8,12 +8,11 @@ export default function ScoreScreen({ score, total, onRestart }: Props) {
   const maxScore = total * 10;
   const percent = Math.round((score / maxScore) * 100);
 
-  let message = '';
-  let emoji = '';
-  if (percent >= 90) { message = 'Performance de Grand Maître !'; emoji = '🏆'; }
-  else if (percent >= 70) { message = 'Très bon travail !'; emoji = '⭐'; }
-  else if (percent >= 50) { message = 'Continuez à pratiquer !'; emoji = '💪'; }
-  else { message = 'La pratique mène à la perfection !'; emoji = '📚'; }
+  const [emoji, message] =
+    percent >= 90 ? ['🏆', 'Performance de Grand Maître !']
+    : percent >= 70 ? ['⭐', 'Très bon travail !']
+    : percent >= 50 ? ['💪', 'Continuez à pratiquer !']
+    : ['📚', 'La pratique mène à la perfection !'];
 
   return (
     <div className="score-screen">

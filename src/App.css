@@ -254,6 +254,159 @@ body {
   transition: width 0.8s ease;
 }
 
+/* ===== Theme Filter ===== */
+.theme-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem 0 1rem;
+}
+.theme-chip {
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: #94a3b8;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.theme-chip:hover { background: #273548; color: #e2e8f0; }
+.theme-chip.active { background: #1d4ed8; border-color: #1d4ed8; color: #fff; }
+
+/* ===== Training Mode Buttons ===== */
+.btn-training-toggle {
+  background: #7c3aed;
+  color: #fff;
+  font-size: 0.82rem;
+  padding: 0.4rem 0.9rem;
+}
+.btn-training-sidebar {
+  background: #4c1d95;
+  color: #c4b5fd;
+  font-size: 0.78rem;
+  padding: 0.4rem 0.9rem;
+  width: 100%;
+  margin-top: 0.25rem;
+}
+.btn-back { background: #334155; color: #94a3b8; font-size: 0.82rem; }
+.btn-analysis { background: #0f172a; color: #38bdf8; border: 1px solid #1e40af; }
+.btn-analysis-active { background: #1e3a5f; color: #7dd3fc; border-color: #38bdf8; }
+
+/* ===== Training Header ===== */
+.training-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+.training-meta { display: flex; flex-direction: column; gap: 0.1rem; }
+.training-theme-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #a78bfa;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.training-count { font-size: 1rem; font-weight: 700; color: #f8fafc; }
+.training-hint { font-size: 0.75rem; color: #475569; margin-top: 0.5rem; text-align: center; }
+
+/* ===== Training Loading / Error ===== */
+.training-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 3rem;
+  color: #94a3b8;
+  min-height: 200px;
+}
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #334155;
+  border-top-color: #38bdf8;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.training-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 3rem;
+  color: #fca5a5;
+}
+.training-error-msg { font-size: 0.95rem; text-align: center; }
+
+/* ===== Analysis Panel ===== */
+.analysis-panel {
+  width: 100%;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-top: 0.5rem;
+}
+.analysis-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-bottom: 1rem;
+}
+.analysis-layout {
+  display: grid;
+  grid-template-columns: 1fr 200px;
+  gap: 1rem;
+  align-items: start;
+}
+.analysis-board-wrap { width: 100%; }
+.analysis-sidebar { display: flex; flex-direction: column; gap: 0.75rem; }
+.move-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.move-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  transition: background 0.1s;
+}
+.move-item:hover { background: #273548; }
+.move-item.active { background: #1e3a5f; color: #e2e8f0; }
+.move-item.player-move .move-uci { color: #86efac; }
+.move-item.opp-move .move-uci { color: #fca5a5; }
+.move-num { color: #475569; min-width: 24px; font-size: 0.72rem; }
+.move-uci { font-weight: 600; font-family: monospace; }
+.move-badge { font-size: 0.62rem; font-weight: 700; padding: 1px 5px; border-radius: 999px; margin-left: auto; }
+.badge-player { background: #14532d; color: #86efac; }
+.badge-opp { background: #450a0a; color: #fca5a5; }
+.analysis-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.btn-nav {
+  background: #334155;
+  color: #94a3b8;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.75rem;
+  flex: 1;
+}
+.btn-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+.step-counter { font-size: 0.72rem; color: #64748b; text-align: center; min-width: 36px; }
+
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
   .game-layout {
@@ -266,4 +419,5 @@ body {
     order: 1;
   }
   .main { padding: 1rem; }
+  .analysis-layout { grid-template-columns: 1fr; }
 }
