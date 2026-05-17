@@ -40,6 +40,19 @@ export default function PuzzleInfo({ puzzle, index, total, score }: Props) {
         </span>
       </div>
 
+      <div className="puzzle-rating">
+        <span>★ Cote Lichess : </span>
+        <strong>{puzzle.rating}</strong>
+        <a
+          href={`https://lichess.org/training/${puzzle.lichessId}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="lichess-link"
+        >
+          Voir sur Lichess ↗
+        </a>
+      </div>
+
       <div className="score-display">
         <span>Score : </span>
         <strong>{score} pts</strong>

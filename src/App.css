@@ -126,6 +126,23 @@ body {
 }
 .score-display strong { color: #38bdf8; font-size: 1.1rem; }
 
+.puzzle-rating {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.puzzle-rating strong { color: #fbbf24; }
+.lichess-link {
+  color: #38bdf8;
+  font-size: 0.75rem;
+  text-decoration: none;
+  margin-left: auto;
+}
+.lichess-link:hover { text-decoration: underline; }
+
 /* ===== Progress Bar ===== */
 .progress-bar-container {
   height: 6px;
