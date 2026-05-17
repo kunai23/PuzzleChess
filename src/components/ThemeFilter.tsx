@@ -1,8 +1,8 @@
-import { puzzles, extraPuzzleMeta } from '../data/puzzles';
+import { puzzles } from '../data/puzzles';
 
 const ALL_THEMES = [
   'Tous',
-  ...Array.from(new Set([...puzzles, ...extraPuzzleMeta].map((p) => p.theme))).sort(),
+  ...Array.from(new Set(puzzles.map((p) => p.theme))).sort(),
 ];
 
 interface Props {
