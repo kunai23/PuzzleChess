@@ -67,8 +67,9 @@ export function usePuzzle(puzzle: Puzzle) {
         afterOpponent.move({ from: oppFrom, to: oppTo, promotion: oppPromo || 'q' });
         setGame(afterOpponent);
         setLastMove({ from: oppFrom, to: oppTo });
-        setSolutionIndex(nextIndex + 1);
-        setStatus('playing');
+        const afterOppIndex = nextIndex + 1;
+        setSolutionIndex(afterOppIndex);
+        setStatus(afterOppIndex >= puzzle.solution.length ? 'solved' : 'playing');
       }, 500);
 
       setSolutionIndex(nextIndex);
