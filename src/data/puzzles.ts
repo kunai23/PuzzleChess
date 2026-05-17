@@ -1,0 +1,133 @@
+export interface Puzzle {
+  id: number;
+  title: string;
+  description: string;
+  fen: string;
+  solution: string[];
+  difficulty: 'Débutant' | 'Intermédiaire' | 'Avancé';
+  theme: string;
+  playerColor: 'w' | 'b';
+}
+
+export const puzzles: Puzzle[] = [
+  {
+    id: 1,
+    title: 'Mat du Berger',
+    description: 'Les Blancs jouent et font mat en 2 coups.',
+    fen: 'r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w KQkq - 4 4',
+    solution: ['f3f7'],
+    difficulty: 'Débutant',
+    theme: 'Mat en 1',
+    playerColor: 'w',
+  },
+  {
+    id: 2,
+    title: 'Fourchette de Cavalier',
+    description: 'Les Blancs jouent et gagnent une pièce majeure avec une fourchette.',
+    fen: 'r1bqkb1r/ppp2ppp/2n5/3pp3/4P3/3P1N2/PPP2PPP/RNBQKB1R w KQkq - 0 5',
+    solution: ['f3e5'],
+    difficulty: 'Débutant',
+    theme: 'Fourchette',
+    playerColor: 'w',
+  },
+  {
+    id: 3,
+    title: 'Clouage Absolu',
+    description: 'Les Noirs jouent et gagnent du matériel grâce à un clouage.',
+    fen: 'r2qkb1r/ppp2ppp/2n5/3p4/3Pn3/3B1N2/PPP2PPP/R1BQK2R b KQkq - 0 8',
+    solution: ['d8d4'],
+    difficulty: 'Intermédiaire',
+    theme: 'Clouage',
+    playerColor: 'b',
+  },
+  {
+    id: 4,
+    title: 'Attaque à la Découverte',
+    description: 'Les Blancs jouent et gagnent la Dame adverse.',
+    fen: 'r1bqk2r/pppp1ppp/2n2n2/2b5/2B1P3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 4 5',
+    solution: ['f3e5'],
+    difficulty: 'Intermédiaire',
+    theme: 'Attaque découverte',
+    playerColor: 'w',
+  },
+  {
+    id: 5,
+    title: 'Mat de l\'Épaulette',
+    description: 'Les Blancs jouent et font mat en 1 coup.',
+    fen: '6rk/6pp/7N/8/8/8/8/6RK w - - 0 1',
+    solution: ['g1g8'],
+    difficulty: 'Intermédiaire',
+    theme: 'Mat en 1',
+    playerColor: 'w',
+  },
+  {
+    id: 6,
+    title: 'Sacrifice de Tour',
+    description: 'Les Blancs sacrifient pour mater en 2 coups.',
+    fen: '5rk1/ppp2ppp/8/8/8/8/PPP2PPP/3R2K1 w - - 0 1',
+    solution: ['d1d8', 'f8d8'],
+    difficulty: 'Avancé',
+    theme: 'Sacrifice',
+    playerColor: 'w',
+  },
+  {
+    id: 7,
+    title: 'Zwischenzug',
+    description: 'Les Noirs trouvent un coup intermédiaire inattendu.',
+    fen: 'r1bq1rk1/ppp2ppp/2n5/3p4/3Pn3/2PB1N2/PP3PPP/R1BQ1RK1 b - - 0 9',
+    solution: ['e4f2'],
+    difficulty: 'Avancé',
+    theme: 'Coup intermédiaire',
+    playerColor: 'b',
+  },
+  {
+    id: 8,
+    title: 'Mat de l\'Arabe',
+    description: 'Les Blancs font mat en 1 coup.',
+    fen: '6nk/6rp/7N/8/8/8/8/7K w - - 0 1',
+    solution: ['h6f7'],
+    difficulty: 'Intermédiaire',
+    theme: 'Mat en 1',
+    playerColor: 'w',
+  },
+  {
+    id: 9,
+    title: 'Fourchette de Pion',
+    description: 'Les Blancs jouent et gagnent une pièce avec une fourchette de pion.',
+    fen: 'r1bqkbnr/ppp1pppp/2n5/3p4/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq d6 0 3',
+    solution: ['e4d5'],
+    difficulty: 'Débutant',
+    theme: 'Fourchette',
+    playerColor: 'w',
+  },
+  {
+    id: 10,
+    title: 'Mat du Couloir',
+    description: 'Les Blancs font mat en 1 coup.',
+    fen: '6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1',
+    solution: ['a1a8'],
+    difficulty: 'Débutant',
+    theme: 'Mat en 1',
+    playerColor: 'w',
+  },
+  {
+    id: 11,
+    title: 'Double Échec',
+    description: 'Les Blancs font mat grâce à un double échec.',
+    fen: 'r5rk/5Npp/8/8/8/8/8/R5K1 w - - 0 1',
+    solution: ['f7h6'],
+    difficulty: 'Avancé',
+    theme: 'Double échec',
+    playerColor: 'w',
+  },
+  {
+    id: 12,
+    title: 'Promotion Gagnante',
+    description: 'Les Blancs font une promotion décisive.',
+    fen: '8/P5k1/8/8/8/8/8/6K1 w - - 0 1',
+    solution: ['a7a8q'],
+    difficulty: 'Débutant',
+    theme: 'Promotion',
+    playerColor: 'w',
+  },
+];
