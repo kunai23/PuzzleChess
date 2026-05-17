@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Chess } from 'chess.js';
 import type { Puzzle } from '../data/puzzles';
 import { fetchPuzzleSetup } from '../services/lichessApi';
@@ -6,64 +6,32 @@ import { fetchPuzzleSetup } from '../services/lichessApi';
 export type PuzzleStatus = 'playing' | 'correct' | 'incorrect' | 'solved';
 
 export function usePuzzle(puzzle: Puzzle, onOpponentMove?: () => void) {
-  // Start at initialFen if known, otherwise at the post-setup position
-  const [game, setGame] = useState(() => new Chess(puzzle.initialFen ?? puzzle.fen));
+  // Always start at the puzzle position (player's turn, after opponent's setup move).
+  const [game, setGame] = useState(() => new Chess(puzzle.fen));
   const [solutionIndex, setSolutionIndex] = useState(0);
   const [status, setStatus] = useState<PuzzleStatus>('playing');
-  const [lastMove, setLastMove] = useState<{ from: string; to: string } | null>(null);
+  // Initialise lastMove from setupMove if already known, so the setup squares
+  // are highlighted in yellow from the very first render.
+  const [lastMove, setLastMove] = useState<{ from: string; to: string } | null>(
+    puzzle.setupMove
+      ? { from: puzzle.setupMove.slice(0, 2), to: puzzle.setupMove.slice(2, 4) }
+      : null
+  );
   const [wrongAttempts, setWrongAttempts] = useState(0);
-  // false = setup animation in progress; player cannot move
-  const [interactive, setInteractive] = useState(!!(puzzle.initialFen == null && puzzle.setupMove == null));
+  const highlightApplied = useRef(!!puzzle.setupMove);
 
-  // Animate the opponent's setup move, then unlock interaction.
+  // If the puzzle doesn't have setupMove yet, lazily fetch it and apply as
+  // the initial lastMove highlight (only if the player hasn't moved yet).
   useEffect(() => {
+    if (highlightApplied.current) return;
     let cancelled = false;
-    const timers: ReturnType<typeof setTimeout>[] = [];
-
-    function animate(initialFen: string, setupFrom: string, setupTo: string, setupPromo?: string) {
-      setGame(new Chess(initialFen));
-      setLastMove(null);
-
-      const t1 = setTimeout(() => {
-        if (cancelled) return;
-        const g = new Chess(initialFen);
-        g.move({ from: setupFrom, to: setupTo, promotion: setupPromo || 'q' });
-        setGame(g);
-        setLastMove({ from: setupFrom, to: setupTo });
-
-        const t2 = setTimeout(() => {
-          if (!cancelled) setInteractive(true);
-        }, 350);
-        timers.push(t2);
-      }, 700);
-      timers.push(t1);
-    }
-
-    if (puzzle.initialFen && puzzle.setupMove) {
-      // Data already available (API-fetched puzzle)
-      const uci = puzzle.setupMove;
-      animate(puzzle.initialFen, uci.slice(0, 2), uci.slice(2, 4), uci.slice(4) || undefined);
-    } else {
-      // Local puzzle — fetch setup data lazily from Lichess API
-      fetchPuzzleSetup(puzzle.id).then((setup) => {
-        if (cancelled) return;
-        if (setup) {
-          animate(setup.initialFen, setup.setupFrom, setup.setupTo, setup.setupPromo);
-        } else {
-          // API unavailable, skip animation and enable play immediately
-          setInteractive(true);
-        }
-      }).catch(() => {
-        if (!cancelled) setInteractive(true);
-      });
-    }
-
-    return () => {
-      cancelled = true;
-      timers.forEach(clearTimeout);
-    };
-    // Re-run only when the puzzle itself changes (key-based remount handles this)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchPuzzleSetup(puzzle.id).then((setup) => {
+      if (cancelled || !setup) return;
+      highlightApplied.current = true;
+      // Only set if the player hasn't moved yet (lastMove still null).
+      setLastMove((prev) => prev === null ? { from: setup.setupFrom, to: setup.setupTo } : prev);
+    }).catch(() => {});
+    return () => { cancelled = true; };
   }, [puzzle.id]);
 
   const reset = useCallback(() => {
@@ -72,12 +40,12 @@ export function usePuzzle(puzzle: Puzzle, onOpponentMove?: () => void) {
     setStatus('playing');
     setLastMove(null);
     setWrongAttempts(0);
-    setInteractive(true); // after reset, skip setup animation
+    highlightApplied.current = false;
   }, [puzzle.fen]);
 
   const makeMove = useCallback(
     (from: string, to: string, promotion?: string) => {
-      if (!interactive || status !== 'playing') return false;
+      if (status !== 'playing') return false;
 
       const expectedUci = puzzle.solution[solutionIndex];
       const expectedFrom = expectedUci.slice(0, 2);
@@ -112,7 +80,6 @@ export function usePuzzle(puzzle: Puzzle, onOpponentMove?: () => void) {
         return true;
       }
 
-      // Play opponent's response
       const opponentUci = puzzle.solution[nextIndex];
       const oppFrom = opponentUci.slice(0, 2);
       const oppTo = opponentUci.slice(2, 4);
@@ -132,7 +99,7 @@ export function usePuzzle(puzzle: Puzzle, onOpponentMove?: () => void) {
       setSolutionIndex(nextIndex);
       return true;
     },
-    [interactive, game, puzzle.solution, solutionIndex, status, onOpponentMove]
+    [game, puzzle.solution, solutionIndex, status, onOpponentMove]
   );
 
   const hint = useCallback(() => {
@@ -143,5 +110,5 @@ export function usePuzzle(puzzle: Puzzle, onOpponentMove?: () => void) {
     return null;
   }, [puzzle.solution, solutionIndex]);
 
-  return { game, status, lastMove, wrongAttempts, interactive, makeMove, reset, hint };
+  return { game, status, lastMove, wrongAttempts, makeMove, reset, hint };
 }

@@ -24,7 +24,7 @@ interface Props {
 export default function PuzzleBoard({ puzzle, onSolved }: Props) {
   const sounds = useSound();
 
-  const { game, status, lastMove, wrongAttempts, interactive, makeMove, reset, hint } = usePuzzle(
+  const { game, status, lastMove, wrongAttempts, makeMove, reset, hint } = usePuzzle(
     puzzle,
     () => sounds.playMove()
   );
@@ -91,7 +91,7 @@ export default function PuzzleBoard({ puzzle, onSolved }: Props) {
   const onSquareClick = useCallback(
     ({ square, piece }: SquareClickArgs) => {
       setRightClickedSquares(new Set());
-      if (!interactive || status !== 'playing') return;
+      if (status !== 'playing') return;
 
       if (selectedSquare) {
         if (legalMoveSquares.includes(square)) {
@@ -114,7 +114,7 @@ export default function PuzzleBoard({ puzzle, onSolved }: Props) {
         clearSelection();
       }
     },
-    [interactive, status, selectedSquare, legalMoveSquares, tryMove, game, puzzle.playerColor]
+    [status, selectedSquare, legalMoveSquares, tryMove, game, puzzle.playerColor]
   );
 
   const handleSolvedClick = () => onSolved(wrongAttempts + (hintUsed ? 1 : 0));
@@ -183,7 +183,7 @@ export default function PuzzleBoard({ puzzle, onSolved }: Props) {
             squareStyles,
             boardStyle,
             animationDurationInMs: 180,
-            allowDragging: interactive && status === 'playing',
+            allowDragging: status === 'playing',
             onPieceDrop: onDrop,
             onSquareClick: onSquareClick as never,
             onSquareRightClick: onSquareRightClick as never,
