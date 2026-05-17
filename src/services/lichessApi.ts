@@ -13,6 +13,13 @@ interface LichessResponse {
   };
 }
 
+export interface SetupData {
+  initialFen: string;
+  setupFrom: string;
+  setupTo: string;
+  setupPromo?: string;
+}
+
 const THEME_FR: Record<string, string> = {
   fork:             'Fourchette',
   pin:              'Clouage',
@@ -36,18 +43,55 @@ function toDifficulty(rating: number): Puzzle['difficulty'] {
   return 'Avancé';
 }
 
-// Pre-populate with local puzzles so known IDs are returned instantly
-const cache = new Map<string, Puzzle>(localPuzzles.map((p) => [p.id, p]));
+// Cache for raw Lichess API responses (shared between fetchPuzzleById + fetchPuzzleSetup)
+const rawCache = new Map<string, LichessResponse>();
+// Cache for processed Puzzle objects
+const puzzleCache = new Map<string, Puzzle>(localPuzzles.map((p) => [p.id, p]));
+// Cache for setup data (populated by API, also used to decorate local puzzles)
+const setupCache = new Map<string, SetupData>();
 
-export async function fetchPuzzleById(id: string): Promise<Puzzle> {
-  if (cache.has(id)) return cache.get(id)!;
-
+async function fetchRaw(id: string): Promise<LichessResponse> {
+  if (rawCache.has(id)) return rawCache.get(id)!;
   const res = await fetch(`https://lichess.org/api/puzzle/${id}`);
   if (!res.ok) throw new Error(`Lichess HTTP ${res.status}`);
-
   const data: LichessResponse = await res.json();
+  rawCache.set(id, data);
+  return data;
+}
 
-  // Replay game PGN to initialPly to get the puzzle start FEN
+function parseSetup(data: LichessResponse): SetupData | null {
+  if (data.puzzle.initialPly < 1) return null;
+  const chess = new Chess();
+  chess.loadPgn(data.game.pgn);
+  const history = chess.history({ verbose: true });
+
+  // Replay to ply BEFORE the setup move
+  chess.reset();
+  for (let i = 0; i < data.puzzle.initialPly - 1 && i < history.length; i++) {
+    chess.move(history[i]);
+  }
+  const initialFen = chess.fen();
+
+  const move = history[data.puzzle.initialPly - 1];
+  if (!move) return null;
+
+  return { initialFen, setupFrom: move.from, setupTo: move.to, setupPromo: move.promotion };
+}
+
+export async function fetchPuzzleById(id: string): Promise<Puzzle> {
+  if (puzzleCache.has(id)) {
+    // Enrich local puzzle with setup data if already fetched
+    const p = puzzleCache.get(id)!;
+    if (!p.initialFen && setupCache.has(id)) {
+      const s = setupCache.get(id)!;
+      return { ...p, initialFen: s.initialFen, setupMove: `${s.setupFrom}${s.setupTo}${s.setupPromo ?? ''}` };
+    }
+    return p;
+  }
+
+  const data = await fetchRaw(id);
+
+  // Replay to initialPly to get the puzzle position (after setup move)
   const chess = new Chess();
   chess.loadPgn(data.game.pgn);
   const history = chess.history({ verbose: true });
@@ -58,8 +102,10 @@ export async function fetchPuzzleById(id: string): Promise<Puzzle> {
 
   const fen = chess.fen();
   const playerColor = chess.turn() as 'w' | 'b';
-  const frenchTheme =
-    data.puzzle.themes.map((t) => THEME_FR[t]).find((t) => !!t) ?? 'Tactique';
+  const frenchTheme = data.puzzle.themes.map((t) => THEME_FR[t]).find((t) => !!t) ?? 'Tactique';
+
+  const setup = parseSetup(data);
+  if (setup) setupCache.set(id, setup);
 
   const puzzle: Puzzle = {
     id: data.puzzle.id,
@@ -72,8 +118,24 @@ export async function fetchPuzzleById(id: string): Promise<Puzzle> {
     difficulty: toDifficulty(data.puzzle.rating),
     theme: frenchTheme,
     playerColor,
+    initialFen: setup?.initialFen,
+    setupMove: setup ? `${setup.setupFrom}${setup.setupTo}${setup.setupPromo ?? ''}` : undefined,
   };
 
-  cache.set(id, puzzle);
+  puzzleCache.set(id, puzzle);
   return puzzle;
+}
+
+// Lazily fetch only setup data (initialFen + setupMove) for a puzzle.
+// Used by usePuzzle to enrich local session puzzles with setup animation.
+export async function fetchPuzzleSetup(id: string): Promise<SetupData | null> {
+  if (setupCache.has(id)) return setupCache.get(id)!;
+  try {
+    const data = await fetchRaw(id);
+    const setup = parseSetup(data);
+    if (setup) setupCache.set(id, setup);
+    return setup;
+  } catch {
+    return null;
+  }
 }

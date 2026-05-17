@@ -2,13 +2,16 @@ export interface Puzzle {
   id: string;
   title: string;
   description: string;
-  fen: string;
+  fen: string;       // position after the opponent's setup move (player's turn)
   solution: string[];
   difficulty: 'Débutant' | 'Intermédiaire' | 'Avancé';
   theme: string;
   playerColor: 'w' | 'b';
   rating: number;
   lichessId: string;
+  // When populated (via Lichess API), usePuzzle shows the setup-move animation.
+  initialFen?: string; // position before the setup move
+  setupMove?: string;  // UCI of the opponent's setup move (e.g. "e1g1")
 }
 
 // Puzzles issus de la base Lichess (https://database.lichess.org/#puzzles)
@@ -134,4 +137,46 @@ export const puzzles: Puzzle[] = [
     playerColor: 'w',
     rating: 1947,
   },
+];
+
+// Lightweight metadata for additional puzzles fetched from the Lichess API.
+// These expand the session pool without requiring hardcoded FEN/solution.
+export interface PuzzleMeta {
+  id: string;
+  difficulty: Puzzle['difficulty'];
+  theme: string;
+}
+
+export const extraPuzzleMeta: PuzzleMeta[] = [
+  // Fourchette
+  { id: 'v9baN', difficulty: 'Débutant',      theme: 'Fourchette' },
+  { id: 'GvnKY', difficulty: 'Intermédiaire', theme: 'Fourchette' },
+  { id: 'BRn6n', difficulty: 'Intermédiaire', theme: 'Fourchette' },
+  { id: 'i35Si', difficulty: 'Avancé',        theme: 'Fourchette' },
+  // Mat en 2
+  { id: 'zGg5q', difficulty: 'Débutant',      theme: 'Mat en 2' },
+  { id: 'pE4dj', difficulty: 'Débutant',      theme: 'Mat en 2' },
+  { id: 'OwJPf', difficulty: 'Intermédiaire', theme: 'Mat en 2' },
+  { id: 'BSJGI', difficulty: 'Intermédiaire', theme: 'Mat en 2' },
+  // Promotion
+  { id: '6JxAI', difficulty: 'Intermédiaire', theme: 'Promotion' },
+  { id: 'FtPOT', difficulty: 'Avancé',        theme: 'Promotion' },
+  // Clouage
+  { id: 'gBXhP', difficulty: 'Intermédiaire', theme: 'Clouage' },
+  { id: 'HaPVP', difficulty: 'Avancé',        theme: 'Clouage' },
+  // Mat en 3
+  { id: 'JHG8g', difficulty: 'Avancé',        theme: 'Mat en 3' },
+  { id: 'xVVi7', difficulty: 'Avancé',        theme: 'Mat en 3' },
+  // Attaque découverte
+  { id: 'Ncu4b', difficulty: 'Intermédiaire', theme: 'Attaque découverte' },
+  { id: 'IVoAh', difficulty: 'Avancé',        theme: 'Attaque découverte' },
+  // Gain de matériel
+  { id: 'JRsHT', difficulty: 'Intermédiaire', theme: 'Gain de matériel' },
+  { id: 'Hg0ZP', difficulty: 'Avancé',        theme: 'Gain de matériel' },
+  // Attaque
+  { id: 'XTAOI', difficulty: 'Intermédiaire', theme: 'Attaque' },
+  { id: 'w3YdI', difficulty: 'Avancé',        theme: 'Attaque' },
+  // Sacrifice
+  { id: 'o0eM4', difficulty: 'Avancé',        theme: 'Sacrifice' },
+  { id: 'feLDa', difficulty: 'Avancé',        theme: 'Sacrifice' },
 ];
